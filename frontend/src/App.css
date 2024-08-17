@@ -1,0 +1,22 @@
+#signup-form{
+    width: 100% ;
+    /* border: 2px solid red; */
+}
+
+#otp-btn{
+    background: rgb(236, 147, 36);
+    border-radius: 20px;
+    border: none;
+}
+
+#image-box{
+ background: #252b39;
+ background-position: center bottom;
+}
+
+#image-svg{
+    object-fit: cover;
+    object-position: center;
+}
+
+
