@@ -130,8 +130,7 @@ const Register = () => {
   const otpResendFunction = async () => {
     try {
       console.log("resend -otp");
-      setTimer(60);
-      setOtpResendEnabled(false);
+     
 
       let response = await axios.post(
         `${API_BASE_URL}/api/user/resend-otp`,
@@ -150,6 +149,8 @@ const Register = () => {
           position: "bottom-center",
           theme: "colored",
         });
+        setTimer(60);
+        setOtpResendEnabled(false);
         setOtpSent(true);
       } else {
         toast.error(response.data.message, {
