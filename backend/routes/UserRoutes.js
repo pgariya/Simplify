@@ -124,7 +124,6 @@ UserRouter.post("/resend-otp", async (req, res) => {
     }
 
     console.log(user,"user")
-    // const otp = generateOtp();
     const otp = user?.mobile?.toString().slice(-6);
     const otpExpiry = Date.now() + 5 * 60 * 1000; // OTP expires in 5 minutes
 
