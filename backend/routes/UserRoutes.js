@@ -24,7 +24,7 @@ UserRouter.post("/send-otp", async (req, res) => {
     }
 
     if (user && user.isVerified == false) {
-      const otp = mobile.slice(-6);
+      const otp = mobile.toString().slice(-6);
       const otpExpiry = Date.now() + 5 * 60 * 1000;
 
       user.name = name;
@@ -43,7 +43,7 @@ UserRouter.post("/send-otp", async (req, res) => {
 
     // const otp = generateOtp();
     // Generate OTP ( last 6 digits of mobile)
-    const otp = mobile.slice(-6);
+    const otp = mobile.toString().slice(-6);
     const otpExpiry = Date.now() + 5 * 60 * 1000; // OTP expires in 5 minutes
 
     user = new User({
@@ -123,8 +123,9 @@ UserRouter.post("/resend-otp", async (req, res) => {
       });
     }
 
+    console.log(user,"user")
     // const otp = generateOtp();
-    const otp = user.mobile.slice(-6);
+    const otp = user?.mobile?.toString().slice(-6);
     const otpExpiry = Date.now() + 5 * 60 * 1000; // OTP expires in 5 minutes
 
     user.otp = otp;
