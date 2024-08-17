@@ -49,7 +49,6 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
-
       console.log(data, "dataa???");
 
       if (!otpSent) {
@@ -81,7 +80,7 @@ const Register = () => {
         }
       } else {
         console.log("verify -otp");
-
+// verify otp ---
         let response = await axios.post(
           `${API_BASE_URL}/api/user/verify-otp`,
           {
