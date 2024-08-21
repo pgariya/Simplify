@@ -66,7 +66,7 @@ POST /api/user/resend-otp - Resend OTP if not received. <br/>
 The application is deployed and can be accessed via the following links:
 
 <h2>Frontend</h2>
-https://66c088dad9e6ac57a5738ff7--warm-sawine-893a2d.netlify.app/
+https://warm-sawine-893a2d.netlify.app/register
 
 <h2>Backend</h2>
 https://simplifybackend.onrender.com
