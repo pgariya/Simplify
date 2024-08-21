@@ -8,14 +8,22 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+
   const { control, register, handleSubmit, watch, formState } = useForm();
   const [otpSent, setOtpSent] = useState(false);
   const [timer, setTimer] = useState(60);
   const [otpResendEnabled, setOtpResendEnabled] = useState(false);
+  const [attempts, setAttempts] = useState(Number(sessionStorage.getItem("Attempts")) || Number(0));
+
+  const [isBlocked, setIsBlocked] = useState(sessionStorage.getItem("isBlocked") || false);
+
   let navigate = useNavigate();
 
   // Watch email field value
   const email = watch("email");
+  const mobile = watch("mobile");
+  const name = watch("name");
+  const salutation = watch("salutation");
 
   useEffect(() => {
     let interval;
@@ -54,8 +62,11 @@ const Register = () => {
       if (!otpSent) {
         console.log("Send -otp");
         let response = await axios.post(
-          `${API_BASE_URL}/api/user/send-otp`,
-          data,
+          // `${API_BASE_URL}/api/user/send-otp`,
+          `https://colo-dev.infollion.com/api/v1/self-registration/register`,
+
+          { salutation: data.salutation.label, name: data.name, email: data.email, mobile: data.mobile }
+          ,
           {
             headers: {
               "Content-Type": "application/json",
@@ -63,27 +74,50 @@ const Register = () => {
           }
         );
 
-        if (response.status === 200) {
+        console.log(response, "response..");
 
+
+        if (response.data.success) {
           toast.success(response.data.message, {
             position: "bottom-center",
             theme: "colored",
           });
           setOtpSent(true);
         } else {
+
           toast.error(response.data.message, {
             position: "bottom-center",
             theme: "colored",
           });
-
-         
         }
+
       } else {
         console.log("verify -otp");
-// verify otp ---
-        let response = await axios.post(
-          `${API_BASE_URL}/api/user/verify-otp`,
+
+        setAttempts(Number(attempts) + 1);
+        sessionStorage.setItem("Attempts", Number(attempts) + 1);
+
+        if (attempts + 1 >= 5) {
+          setIsBlocked(true);
+          sessionStorage.setItem("isBlocked", true);
+
+          toast.error(" You have reached the maximum number of attempts. Please try again later.", {
+            position: "bottom-center",
+            theme: "colored",
+          });
+
+          return;
+
+        }
+
+
+
+        // verify otp ---
+        let res = await axios.post(
+          // `${API_BASE_URL}/api/user/verify-otp`,
+          `https://colo-dev.infollion.com/api/v1/self-registration/verify-otp`,
           {
+            action: "SelfRegister",
             email: data.email,
             otp: data.otp,
           },
@@ -94,30 +128,65 @@ const Register = () => {
           }
         );
 
-        if (response.status === 200) {
-          toast.success(response.data.message, {
+        console.log(res, "reponsee");
+
+        if (res.status == "200") {
+
+          toast.success(res.data.message, {
             position: "bottom-center",
             theme: "colored",
           });
           setOtpSent(true);
+          setAttempts(0);
+          sessionStorage.setItem("Attempts", Number(0));
+          sessionStorage.setItem("isBlocked", false);
           navigate("/login");
+
+
+
         } else {
-          toast.error(response.data.message, {
+
+          toast.error(res.data.message, {
             position: "bottom-center",
             theme: "colored",
           });
+
         }
+
+
+
+        // if (response.status === 200) {
+        //   toast.success(response.data.message, {
+        //     position: "bottom-center",
+        //     theme: "colored",
+        //   });
+        //   setOtpSent(true);
+        //   navigate("/login");
+        // } else {
+        //   toast.error(response.data.message, {
+        //     position: "bottom-center",
+        //     theme: "colored",
+        //   });
+        // }
+
       }
     } catch (error) {
-      if (error.response) {
+
+      console.log(error, "error");
+      console.log(error.message, "message");
+      console.log(error.response, "responseee");
+
+
+      if (error.response?.data?.error || error.response?.data?.message) {
         toast.error(
-          error.response.data.message || "An error occurred. Please try again.",
+          error.response.data.error || error.response.data.message || "An error occurred. Please try again.",
           {
             position: "bottom-center",
             theme: "colored",
           }
         );
       } else {
+
         toast.error("An error occurred. Please try again.", {
           position: "bottom-center",
           theme: "colored",
@@ -126,15 +195,20 @@ const Register = () => {
     }
   };
 
+
   const otpResendFunction = async () => {
     try {
       console.log("resend -otp");
-     
+
 
       let response = await axios.post(
-        `${API_BASE_URL}/api/user/resend-otp`,
+        // `${API_BASE_URL}/api/user/resend-otp`,
+        `https://colo-dev.infollion.com/api/v1/self-registration/register`,
         {
+          name: name,
           email: email,
+          mobile: mobile,
+          salutation: salutation.label
         },
         {
           headers: {
@@ -143,7 +217,9 @@ const Register = () => {
         }
       );
 
-      if (response.status === 200) {
+      console.log(response, "responsee");
+
+      if (response.data.success) {
         toast.success(response.data.message, {
           position: "bottom-center",
           theme: "colored",
@@ -432,7 +508,7 @@ const Register = () => {
             )}
 
             {!otpSent ? (
-              <Button variant="contained" type="submit" fullWidth id="otp-btn">
+              <Button variant="contained" type="submit" fullWidth id="otp-btn" >
                 Get OTP on email
               </Button>
             ) : (
